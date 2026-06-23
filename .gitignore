@@ -36,3 +36,6 @@ Thumbs.db
 
 # Automatic machine-readable experiment history
 results/experiment_history.jsonl
+
+# Generated experiment outputs
+results/
