@@ -2,6 +2,9 @@ import argparse
 
 import torch
 import torch.nn.functional as functional
+from dataclasses import asdict
+from experiment_logger import record_experiment
+from tqdm.auto import tqdm
 
 from config import ExperimentConfig
 from data import build_dataloaders
@@ -198,6 +201,30 @@ def main():
             if key != "model_state_dict"
         }
     )
+
+    record_experiment(
+    run_name="train_binary_resnet18",
+    config={
+        **asdict(config),
+        "optimizer": "AdamW",
+        "scheduler": "CosineAnnealingLR",
+        "model": "ImageNet-pretrained ResNet-18",
+        "quantization_target": (
+            "FP32 training baseline"
+        ),
+    },
+    metrics={
+        "best_validation_accuracy": checkpoint.get(
+            "best_validation_accuracy"
+        ),
+        "test_loss": test_metrics["loss"],
+        "test_accuracy": test_metrics["accuracy"],
+        "test_num_samples": test_metrics["num_samples"],
+    },
+    artifacts={
+        "checkpoint": str(config.checkpoint_path),
+    },
+)
 
 
 if __name__ == "__main__":

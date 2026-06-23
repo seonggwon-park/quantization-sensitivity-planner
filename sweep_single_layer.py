@@ -4,6 +4,7 @@ from pathlib import Path
 
 import torch
 
+from experiment_logger import record_experiment
 from config import ExperimentConfig
 from data import build_dataloaders, make_fixed_subset_loader
 from metrics import compare_binary_models
@@ -230,6 +231,46 @@ def main():
     )
 
     print(f"\nSaved final sweep: {output_path}")
+    worst_risk_row = max(
+    rows,
+    key=lambda row: row["p95_margin_risk"],
+)
+
+worst_flip_row = max(
+    rows,
+    key=lambda row: row["flip_rate"],
+)
+
+record_experiment(
+    run_name="single_layer_quantization_sweep",
+    config={
+        "task": config.class_names,
+        "model": "binary ResNet-18",
+        "max_samples": args.max_samples,
+        "requested_bits": args.bits,
+        "num_layers": len(target_layer_names),
+        "quantization": (
+            "single-layer weight-only fake quantization, "
+            "per-output-channel symmetric"
+        ),
+    },
+    metrics={
+        "num_experiments": len(rows),
+        "highest_p95_risk_layer": worst_risk_row["layer"],
+        "highest_p95_risk_action": worst_risk_row["action"],
+        "highest_p95_margin_risk": worst_risk_row[
+            "p95_margin_risk"
+        ],
+        "highest_flip_rate_layer": worst_flip_row["layer"],
+        "highest_flip_rate_action": worst_flip_row["action"],
+        "highest_flip_rate": worst_flip_row[
+            "flip_rate"
+        ],
+    },
+    artifacts={
+        "csv": str(output_path),
+    },
+)
 
 
 if __name__ == "__main__":
