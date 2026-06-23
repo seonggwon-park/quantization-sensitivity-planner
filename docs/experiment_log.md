@@ -155,3 +155,46 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\uniform_baselines.csv |
 
+
+
+## 2026-06-23T20:19:29+09:00 — single_layer_quantization_sweep
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe sweep_single_layer.py --max-samples 128 --layers conv1 fc`
+- Git branch: `main`
+- Git commit: `24076f3`
+- Git working tree: `M sweep_single_layer.py`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| max_samples | 128 |
+| requested_bits | [16, 8, 4] |
+| num_layers | 2 |
+| quantization | single-layer weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| num_experiments | 6 |
+| highest_p95_risk_layer | conv1 |
+| highest_p95_risk_action | int4 |
+| highest_p95_margin_risk | 1.2771583795547485 |
+| highest_flip_rate_layer | conv1 |
+| highest_flip_rate_action | int4 |
+| highest_flip_rate | 0.078125 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\single_layer_sweep.csv |
+
