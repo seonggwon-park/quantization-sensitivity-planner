@@ -910,3 +910,53 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\validation_local_activation_proxy_all_bits.csv |
 
+
+
+## 2026-06-23T21:56:30+09:00 — local_activation_p95_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_local_activation_proxy_all_bits.csv --risk-metric p95_relative_activation_error --risk-label local_activation_p95 --memory-saving-ratios 0.873 0.850 --evaluation-split test --max-samples 128`
+- Git branch: `main`
+- Git commit: `75b73aa`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | local_activation_p95 |
+| risk_csv | results\validation_local_activation_proxy_all_bits.csv |
+| risk_metric | p95_relative_activation_error |
+| evaluation_split | test |
+| max_samples | 128 |
+| requested_memory_saving_ratios | [0.873, 0.85] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_0_873_flip_rate | 0.0078125 |
+| save_0_873_quantized_accuracy | 0.984375 |
+| save_0_873_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_0_873_planner_objective | 2.0864445240586056 |
+| save_0_850_flip_rate | 0.0 |
+| save_0_850_quantized_accuracy | 0.9921875 |
+| save_0_850_actual_memory_saving_ratio | 0.8500247550041878 |
+| save_0_850_planner_objective | 0.6974130095127287 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\local_activation_p95_additive_planner_results.csv |
+| allocations_csv | results\local_activation_p95_additive_planner_allocations.csv |
+
