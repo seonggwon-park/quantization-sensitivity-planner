@@ -1018,3 +1018,477 @@ Automatically generated experiment records.
 | results_csv | results\local_activation_p95_additive_planner_results.csv |
 | allocations_csv | results\local_activation_p95_additive_planner_allocations.csv |
 
+
+
+## 2026-06-23T22:00:29+09:00 — weight_l2_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_single_layer_sweep.csv --risk-metric relative_l2_weight_error --risk-label weight_l2 --memory-saving-ratios 0.873 0.870 0.850 0.800 --evaluation-split test --max-samples 2000`
+- Git branch: `main`
+- Git commit: `6c5dfba`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | weight_l2 |
+| risk_csv | results\validation_single_layer_sweep.csv |
+| risk_metric | relative_l2_weight_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.873, 0.87, 0.85, 0.8] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_0_873_flip_rate | 0.0055 |
+| save_0_873_quantized_accuracy | 0.9915 |
+| save_0_873_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_0_873_planner_objective | 3.741347243703785 |
+| save_0_870_flip_rate | 0.0045 |
+| save_0_870_quantized_accuracy | 0.9925 |
+| save_0_870_actual_memory_saving_ratio | 0.8701236354553212 |
+| save_0_870_planner_objective | 2.926059558216365 |
+| save_0_850_flip_rate | 0.0025 |
+| save_0_850_quantized_accuracy | 0.9945 |
+| save_0_850_actual_memory_saving_ratio | 0.8500333436576104 |
+| save_0_850_planner_objective | 1.5434066644374973 |
+| save_0_800_flip_rate | 0.0005 |
+| save_0_800_quantized_accuracy | 0.9955 |
+| save_0_800_actual_memory_saving_ratio | 0.8000588322759449 |
+| save_0_800_planner_objective | 0.6551589915616195 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\weight_l2_additive_planner_results.csv |
+| allocations_csv | results\weight_l2_additive_planner_allocations.csv |
+
+
+
+## 2026-06-23T22:00:52+09:00 — empirical_margin_p95_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_single_layer_sweep.csv --risk-metric p95_margin_risk --risk-label empirical_margin_p95 --memory-saving-ratios 0.873 0.870 0.850 0.800 --evaluation-split test --max-samples 2000`
+- Git branch: `main`
+- Git commit: `6c5dfba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | empirical_margin_p95 |
+| risk_csv | results\validation_single_layer_sweep.csv |
+| risk_metric | p95_margin_risk |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.873, 0.87, 0.85, 0.8] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_0_873_flip_rate | 0.0055 |
+| save_0_873_quantized_accuracy | 0.9915 |
+| save_0_873_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_0_873_planner_objective | 1.337395449329051 |
+| save_0_870_flip_rate | 0.003 |
+| save_0_870_quantized_accuracy | 0.995 |
+| save_0_870_actual_memory_saving_ratio | 0.8700964380528162 |
+| save_0_870_planner_objective | 0.8315534689318145 |
+| save_0_850_flip_rate | 0.0025 |
+| save_0_850_quantized_accuracy | 0.9955 |
+| save_0_850_actual_memory_saving_ratio | 0.8500247550041878 |
+| save_0_850_planner_objective | 0.36037927741563086 |
+| save_0_800_flip_rate | 0.0005 |
+| save_0_800_quantized_accuracy | 0.9955 |
+| save_0_800_actual_memory_saving_ratio | 0.8000588322759449 |
+| save_0_800_planner_objective | 0.11367605144914612 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\empirical_margin_p95_additive_planner_results.csv |
+| allocations_csv | results\empirical_margin_p95_additive_planner_allocations.csv |
+
+
+
+## 2026-06-23T22:05:47+09:00 — weight_l2_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_single_layer_sweep.csv --risk-metric relative_l2_weight_error --risk-label weight_l2 --memory-saving-ratios 0.874 0.8735 0.873 0.8725 0.872 0.8715 0.871 0.8705 0.870 --evaluation-split test --max-samples 2000`
+- Git branch: `main`
+- Git commit: `6c5dfba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | weight_l2 |
+| risk_csv | results\validation_single_layer_sweep.csv |
+| risk_metric | relative_l2_weight_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.874, 0.8735, 0.873, 0.8725, 0.872, 0.8715, 0.871, 0.8705, 0.87] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_0_874_flip_rate | 0.0055 |
+| save_0_874_quantized_accuracy | 0.9925 |
+| save_0_874_actual_memory_saving_ratio | 0.8735590968243633 |
+| save_0_874_planner_objective | 3.972181596793234 |
+| save_0_873_flip_rate | 0.1435 |
+| save_0_873_quantized_accuracy | 0.8555 |
+| save_0_873_actual_memory_saving_ratio | 0.8725191540391095 |
+| save_0_873_planner_objective | 3.520087460405193 |
+| save_0_872_flip_rate | 0.004 |
+| save_0_872_quantized_accuracy | 0.994 |
+| save_0_872_actual_memory_saving_ratio | 0.8715436261545253 |
+| save_0_872_planner_objective | 3.1427667237585406 |
+| save_0_871_flip_rate | 0.004 |
+| save_0_871_quantized_accuracy | 0.994 |
+| save_0_871_actual_memory_saving_ratio | 0.8707377241750375 |
+| save_0_871_planner_objective | 2.965286029517301 |
+| save_0_870_flip_rate | 0.0045 |
+| save_0_870_quantized_accuracy | 0.9925 |
+| save_0_870_actual_memory_saving_ratio | 0.8701236354553212 |
+| save_0_870_planner_objective | 2.926059558216365 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\weight_l2_additive_planner_results.csv |
+| allocations_csv | results\weight_l2_additive_planner_allocations.csv |
+
+
+
+## 2026-06-23T22:06:26+09:00 — local_activation_p95_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_local_activation_proxy_all_bits.csv --risk-metric p95_relative_activation_error --risk-label local_activation_p95 --memory-saving-ratios 0.874 0.8735 0.873 0.8725 0.872 0.8715 0.871 0.8705 0.870 --evaluation-split test --max-samples 2000`
+- Git branch: `main`
+- Git commit: `6c5dfba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | local_activation_p95 |
+| risk_csv | results\validation_local_activation_proxy_all_bits.csv |
+| risk_metric | p95_relative_activation_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.874, 0.8735, 0.873, 0.8725, 0.872, 0.8715, 0.871, 0.8705, 0.87] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_0_874_flip_rate | 0.009 |
+| save_0_874_quantized_accuracy | 0.988 |
+| save_0_874_actual_memory_saving_ratio | 0.8735590968243633 |
+| save_0_874_planner_objective | 2.2413226412609215 |
+| save_0_873_flip_rate | 0.0055 |
+| save_0_873_quantized_accuracy | 0.9915 |
+| save_0_873_actual_memory_saving_ratio | 0.8725699702385266 |
+| save_0_873_planner_objective | 1.9521693855349433 |
+| save_0_872_flip_rate | 0.0045 |
+| save_0_872_quantized_accuracy | 0.9935 |
+| save_0_872_actual_memory_saving_ratio | 0.8715436261545253 |
+| save_0_872_planner_objective | 1.6666676872409873 |
+| save_0_871_flip_rate | 0.004 |
+| save_0_871_quantized_accuracy | 0.994 |
+| save_0_871_actual_memory_saving_ratio | 0.8707377241750375 |
+| save_0_871_planner_objective | 1.5369682900200121 |
+| save_0_870_flip_rate | 0.0045 |
+| save_0_870_quantized_accuracy | 0.9935 |
+| save_0_870_actual_memory_saving_ratio | 0.870077829303734 |
+| save_0_870_planner_objective | 1.513387110549956 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\local_activation_p95_additive_planner_results.csv |
+| allocations_csv | results\local_activation_p95_additive_planner_allocations.csv |
+
+
+
+## 2026-06-23T22:12:17+09:00 — weight_l2_dense_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_single_layer_sweep.csv --risk-metric relative_l2_weight_error --risk-label weight_l2_dense --memory-saving-ratios 0.874 0.8735 0.873 0.8725 0.872 0.8715 0.871 0.8705 0.870 --evaluation-split test --max-samples 2000 --results-output results/weight_l2_dense_results.csv --allocations-output results/weight_l2_dense_allocations.csv`
+- Git branch: `main`
+- Git commit: `ed521ba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | weight_l2_dense |
+| risk_csv | results\validation_single_layer_sweep.csv |
+| risk_metric | relative_l2_weight_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.874, 0.8735, 0.873, 0.8725, 0.872, 0.8715, 0.871, 0.8705, 0.87] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_8740bp_flip_rate | 0.0075 |
+| save_8740bp_quantized_accuracy | 0.9895 |
+| save_8740bp_actual_memory_saving_ratio | 0.8740400614160292 |
+| save_8740bp_planner_objective | 4.2363534714095294 |
+| save_8735bp_flip_rate | 0.0055 |
+| save_8735bp_quantized_accuracy | 0.9925 |
+| save_8735bp_actual_memory_saving_ratio | 0.8735590968243633 |
+| save_8735bp_planner_objective | 3.972181596793234 |
+| save_8730bp_flip_rate | 0.0055 |
+| save_8730bp_quantized_accuracy | 0.9915 |
+| save_8730bp_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_8730bp_planner_objective | 3.741347243703785 |
+| save_8725bp_flip_rate | 0.1435 |
+| save_8725bp_quantized_accuracy | 0.8555 |
+| save_8725bp_actual_memory_saving_ratio | 0.8725191540391095 |
+| save_8725bp_planner_objective | 3.520087460405193 |
+| save_8720bp_flip_rate | 0.0045 |
+| save_8720bp_quantized_accuracy | 0.9925 |
+| save_8720bp_actual_memory_saving_ratio | 0.8720245907461912 |
+| save_8720bp_planner_objective | 3.190388258080929 |
+| save_8715bp_flip_rate | 0.004 |
+| save_8715bp_quantized_accuracy | 0.994 |
+| save_8715bp_actual_memory_saving_ratio | 0.8715436261545253 |
+| save_8715bp_planner_objective | 3.1427667237585406 |
+| save_8710bp_flip_rate | 0.004 |
+| save_8710bp_quantized_accuracy | 0.994 |
+| save_8710bp_actual_memory_saving_ratio | 0.8711313707902402 |
+| save_8710bp_planner_objective | 2.9828989226371045 |
+| save_8705bp_flip_rate | 0.004 |
+| save_8705bp_quantized_accuracy | 0.994 |
+| save_8705bp_actual_memory_saving_ratio | 0.8707377241750375 |
+| save_8705bp_planner_objective | 2.965286029517301 |
+| save_8700bp_flip_rate | 0.0045 |
+| save_8700bp_quantized_accuracy | 0.9925 |
+| save_8700bp_actual_memory_saving_ratio | 0.8701236354553212 |
+| save_8700bp_planner_objective | 2.926059558216365 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\weight_l2_dense_results.csv |
+| allocations_csv | results\weight_l2_dense_allocations.csv |
+
+
+
+## 2026-06-23T22:12:52+09:00 — local_activation_dense_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_local_activation_proxy_all_bits.csv --risk-metric p95_relative_activation_error --risk-label local_activation_dense --memory-saving-ratios 0.874 0.8735 0.873 0.8725 0.872 0.8715 0.871 0.8705 0.870 --evaluation-split test --max-samples 2000 --results-output results/local_activation_dense_results.csv --allocations-output results/local_activation_dense_allocations.csv`
+- Git branch: `main`
+- Git commit: `ed521ba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | local_activation_dense |
+| risk_csv | results\validation_local_activation_proxy_all_bits.csv |
+| risk_metric | p95_relative_activation_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.874, 0.8735, 0.873, 0.8725, 0.872, 0.8715, 0.871, 0.8705, 0.87] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_8740bp_flip_rate | 0.0075 |
+| save_8740bp_quantized_accuracy | 0.9895 |
+| save_8740bp_actual_memory_saving_ratio | 0.8740400614160292 |
+| save_8740bp_planner_objective | 2.396156709233764 |
+| save_8735bp_flip_rate | 0.009 |
+| save_8735bp_quantized_accuracy | 0.988 |
+| save_8735bp_actual_memory_saving_ratio | 0.8735590968243633 |
+| save_8735bp_planner_objective | 2.2413226412609215 |
+| save_8730bp_flip_rate | 0.0055 |
+| save_8730bp_quantized_accuracy | 0.9915 |
+| save_8730bp_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_8730bp_planner_objective | 2.0864445240586056 |
+| save_8725bp_flip_rate | 0.0055 |
+| save_8725bp_quantized_accuracy | 0.9915 |
+| save_8725bp_actual_memory_saving_ratio | 0.8725699702385266 |
+| save_8725bp_planner_objective | 1.9521693855349433 |
+| save_8720bp_flip_rate | 0.0045 |
+| save_8720bp_quantized_accuracy | 0.9925 |
+| save_8720bp_actual_memory_saving_ratio | 0.8720245907461912 |
+| save_8720bp_planner_objective | 1.728305580618325 |
+| save_8715bp_flip_rate | 0.0045 |
+| save_8715bp_quantized_accuracy | 0.9935 |
+| save_8715bp_actual_memory_saving_ratio | 0.8715436261545253 |
+| save_8715bp_planner_objective | 1.6666676872409873 |
+| save_8710bp_flip_rate | 0.004 |
+| save_8710bp_quantized_accuracy | 0.994 |
+| save_8710bp_actual_memory_saving_ratio | 0.8711313707902402 |
+| save_8710bp_planner_objective | 1.5576319852843872 |
+| save_8705bp_flip_rate | 0.004 |
+| save_8705bp_quantized_accuracy | 0.994 |
+| save_8705bp_actual_memory_saving_ratio | 0.8707377241750375 |
+| save_8705bp_planner_objective | 1.5369682900200121 |
+| save_8700bp_flip_rate | 0.0045 |
+| save_8700bp_quantized_accuracy | 0.9935 |
+| save_8700bp_actual_memory_saving_ratio | 0.870077829303734 |
+| save_8700bp_planner_objective | 1.513387110549956 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\local_activation_dense_results.csv |
+| allocations_csv | results\local_activation_dense_allocations.csv |
+
+
+
+## 2026-06-23T22:13:33+09:00 — empirical_margin_dense_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_single_layer_sweep.csv --risk-metric p95_margin_risk --risk-label empirical_margin_dense --memory-saving-ratios 0.874 0.8735 0.873 0.8725 0.872 0.8715 0.871 0.8705 0.870 --evaluation-split test --max-samples 2000 --results-output results/empirical_margin_dense_results.csv --allocations-output results/empirical_margin_dense_allocations.csv`
+- Git branch: `main`
+- Git commit: `ed521ba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | empirical_margin_dense |
+| risk_csv | results\validation_single_layer_sweep.csv |
+| risk_metric | p95_margin_risk |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.874, 0.8735, 0.873, 0.8725, 0.872, 0.8715, 0.871, 0.8705, 0.87] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_8740bp_flip_rate | 0.0075 |
+| save_8740bp_quantized_accuracy | 0.9895 |
+| save_8740bp_actual_memory_saving_ratio | 0.8740400614160292 |
+| save_8740bp_planner_objective | 1.8911936713557223 |
+| save_8735bp_flip_rate | 0.0055 |
+| save_8735bp_quantized_accuracy | 0.9925 |
+| save_8735bp_actual_memory_saving_ratio | 0.8735590968243633 |
+| save_8735bp_planner_objective | 1.5929703693836923 |
+| save_8730bp_flip_rate | 0.0055 |
+| save_8730bp_quantized_accuracy | 0.9915 |
+| save_8730bp_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_8730bp_planner_objective | 1.337395449329051 |
+| save_8725bp_flip_rate | 0.004 |
+| save_8725bp_quantized_accuracy | 0.993 |
+| save_8725bp_actual_memory_saving_ratio | 0.8725241640869393 |
+| save_8725bp_planner_objective | 1.1514430558308952 |
+| save_8720bp_flip_rate | 0.005 |
+| save_8720bp_quantized_accuracy | 0.992 |
+| save_8720bp_actual_memory_saving_ratio | 0.8721119087226543 |
+| save_8720bp_planner_objective | 1.0538677768781772 |
+| save_8715bp_flip_rate | 0.004 |
+| save_8715bp_quantized_accuracy | 0.994 |
+| save_8715bp_actual_memory_saving_ratio | 0.8715436261545253 |
+| save_8715bp_planner_objective | 0.9555634488933709 |
+| save_8710bp_flip_rate | 0.004 |
+| save_8710bp_quantized_accuracy | 0.994 |
+| save_8710bp_actual_memory_saving_ratio | 0.8711041733877353 |
+| save_8710bp_planner_objective | 0.8749890224571563 |
+| save_8705bp_flip_rate | 0.003 |
+| save_8705bp_quantized_accuracy | 0.995 |
+| save_8705bp_actual_memory_saving_ratio | 0.8705315964928949 |
+| save_8705bp_planner_objective | 0.8502979230397602 |
+| save_8700bp_flip_rate | 0.003 |
+| save_8700bp_quantized_accuracy | 0.995 |
+| save_8700bp_actual_memory_saving_ratio | 0.8700964380528162 |
+| save_8700bp_planner_objective | 0.8315534689318145 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\empirical_margin_dense_results.csv |
+| allocations_csv | results\empirical_margin_dense_allocations.csv |
+
