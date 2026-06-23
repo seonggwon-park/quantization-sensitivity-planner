@@ -1,0 +1,35 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Dataset downloads
+data/
+
+# Trained model weights and checkpoints
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Generated experimental outputs
+results/*.csv
+results/*.json
+results/*.png
+results/*.pdf
+
+# Operating-system files
+.DS_Store
+Thumbs.db
