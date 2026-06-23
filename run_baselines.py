@@ -6,6 +6,7 @@ from config import ExperimentConfig
 from data import build_dataloaders, make_fixed_subset_loader
 from metrics import compare_binary_models
 from model import load_binary_resnet18_checkpoint
+from experiment_logger import record_experiment
 from quantization import (
     build_uniform_quantized_model,
     estimate_parameter_memory_mb,
@@ -144,6 +145,45 @@ def main():
     save_csv(rows, output_path)
 
     print(f"\nSaved: {output_path}")
+
+    baseline_metrics = {}
+
+    for row in rows:
+        action = row["action"]
+
+        baseline_metrics[
+            f"{action}_quantized_accuracy"
+        ] = row["quantized_accuracy"]
+
+        baseline_metrics[
+            f"{action}_flip_rate"
+        ] = row["flip_rate"]
+
+        baseline_metrics[
+            f"{action}_mean_margin_risk"
+        ] = row["mean_margin_risk"]
+
+        baseline_metrics[
+            f"{action}_memory_saving_ratio"
+        ] = row["memory_saving_ratio"]
+
+    record_experiment(
+        run_name="uniform_fake_quantization_baseline",
+        config={
+            "task": config.class_names,
+            "model": "binary ResNet-18",
+            "max_samples": args.max_samples,
+            "actions": list(action_to_bits.keys()),
+            "quantization": (
+                "weight-only fake quantization, "
+                "per-output-channel symmetric"
+            ),
+        },
+        metrics=baseline_metrics,
+        artifacts={
+            "csv": str(output_path),
+        },
+    )
 
 
 if __name__ == "__main__":
