@@ -372,3 +372,143 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\validation_single_layer_sweep.csv |
 
+
+
+## 2026-06-23T20:53:45+09:00 — oracle_guided_mixed_precision_controls
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_oracle_guided_controls.py --ranking-csv results/validation_single_layer_sweep.csv --evaluation-split test --max-samples 128 --include-bottom-controls`
+- Git branch: `main`
+- Git commit: `1ffab6c`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| ranking_csv | results\validation_single_layer_sweep.csv |
+| ranking_action | int4 |
+| risk_metric | p95_margin_risk |
+| evaluation_split | test |
+| max_samples | 128 |
+| protect_counts | [0, 1, 2, 4] |
+| default_bits | 4 |
+| protected_bits | 32 |
+| include_bottom_controls | True |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| uniform_int4_flip_rate | 0.09375 |
+| uniform_int4_quantized_accuracy | 0.8984375 |
+| uniform_int4_memory_saving_ratio | 0.8742483362615274 |
+| uniform_int4_mean_margin_risk | 0.6231024265289307 |
+| oracle_top1_fp32_flip_rate | 0.0234375 |
+| oracle_top1_fp32_quantized_accuracy | 0.96875 |
+| oracle_top1_fp32_memory_saving_ratio | 0.873511859230539 |
+| oracle_top1_fp32_mean_margin_risk | 0.26023995876312256 |
+| oracle_bottom1_fp32_flip_rate | 0.09375 |
+| oracle_bottom1_fp32_quantized_accuracy | 0.8984375 |
+| oracle_bottom1_fp32_memory_saving_ratio | 0.8741681754962497 |
+| oracle_bottom1_fp32_mean_margin_risk | 0.620140016078949 |
+| oracle_top2_fp32_flip_rate | 0.015625 |
+| oracle_top2_fp32_quantized_accuracy | 0.9765625 |
+| oracle_top2_fp32_memory_saving_ratio | 0.8706260716805436 |
+| oracle_top2_fp32_mean_margin_risk | 0.23297438025474548 |
+| oracle_bottom2_fp32_flip_rate | 0.09375 |
+| oracle_bottom2_fp32_quantized_accuracy | 0.8984375 |
+| oracle_bottom2_fp32_memory_saving_ratio | 0.6894777722965468 |
+| oracle_bottom2_fp32_mean_margin_risk | 0.6147286891937256 |
+| oracle_top4_fp32_flip_rate | 0.0078125 |
+| oracle_top4_fp32_quantized_accuracy | 0.984375 |
+| oracle_top4_fp32_memory_saving_ratio | 0.867098998008327 |
+| oracle_top4_fp32_mean_margin_risk | 0.14160706102848053 |
+| oracle_bottom4_fp32_flip_rate | 0.09375 |
+| oracle_bottom4_fp32_quantized_accuracy | 0.8984375 |
+| oracle_bottom4_fp32_memory_saving_ratio | 0.5022222246079593 |
+| oracle_bottom4_fp32_mean_margin_risk | 0.6146207451820374 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\oracle_guided_mixed_controls.csv |
+
+
+
+## 2026-06-23T20:54:19+09:00 — oracle_guided_mixed_precision_controls
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_oracle_guided_controls.py --ranking-csv results/validation_single_layer_sweep.csv --evaluation-split test --max-samples 2000 --include-bottom-controls`
+- Git branch: `main`
+- Git commit: `1ffab6c`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| ranking_csv | results\validation_single_layer_sweep.csv |
+| ranking_action | int4 |
+| risk_metric | p95_margin_risk |
+| evaluation_split | test |
+| max_samples | 2000 |
+| protect_counts | [0, 1, 2, 4] |
+| default_bits | 4 |
+| protected_bits | 32 |
+| include_bottom_controls | True |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| uniform_int4_flip_rate | 0.153 |
+| uniform_int4_quantized_accuracy | 0.846 |
+| uniform_int4_memory_saving_ratio | 0.8742483362615274 |
+| uniform_int4_mean_margin_risk | 0.7086520195007324 |
+| oracle_top1_fp32_flip_rate | 0.0125 |
+| oracle_top1_fp32_quantized_accuracy | 0.9845 |
+| oracle_top1_fp32_memory_saving_ratio | 0.873511859230539 |
+| oracle_top1_fp32_mean_margin_risk | 0.24971544742584229 |
+| oracle_bottom1_fp32_flip_rate | 0.1505 |
+| oracle_bottom1_fp32_quantized_accuracy | 0.8485 |
+| oracle_bottom1_fp32_memory_saving_ratio | 0.8741681754962497 |
+| oracle_bottom1_fp32_mean_margin_risk | 0.7063938975334167 |
+| oracle_top2_fp32_flip_rate | 0.007 |
+| oracle_top2_fp32_quantized_accuracy | 0.99 |
+| oracle_top2_fp32_memory_saving_ratio | 0.8706260716805436 |
+| oracle_top2_fp32_mean_margin_risk | 0.24099984765052795 |
+| oracle_bottom2_fp32_flip_rate | 0.144 |
+| oracle_bottom2_fp32_quantized_accuracy | 0.855 |
+| oracle_bottom2_fp32_memory_saving_ratio | 0.6894777722965468 |
+| oracle_bottom2_fp32_mean_margin_risk | 0.701242983341217 |
+| oracle_top4_fp32_flip_rate | 0.0055 |
+| oracle_top4_fp32_quantized_accuracy | 0.9915 |
+| oracle_top4_fp32_memory_saving_ratio | 0.867098998008327 |
+| oracle_top4_fp32_mean_margin_risk | 0.15953198075294495 |
+| oracle_bottom4_fp32_flip_rate | 0.1445 |
+| oracle_bottom4_fp32_quantized_accuracy | 0.8545 |
+| oracle_bottom4_fp32_memory_saving_ratio | 0.5022222246079593 |
+| oracle_bottom4_fp32_mean_margin_risk | 0.7014716863632202 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\oracle_guided_mixed_controls.csv |
+
