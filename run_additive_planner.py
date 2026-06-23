@@ -148,10 +148,11 @@ def bytes_to_mb(memory_bytes: int) -> float:
 def format_budget_key(
     memory_saving_ratio: float,
 ) -> str:
-    return (
-        f"save_{memory_saving_ratio:.3f}"
-        .replace(".", "_")
+    basis_points = int(
+        round(memory_saving_ratio * 10_000)
     )
+
+    return f"save_{basis_points:04d}bp"
 
 
 def main():
