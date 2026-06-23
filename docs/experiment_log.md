@@ -746,3 +746,121 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\validation_local_activation_proxy.csv |
 
+
+
+## 2026-06-23T21:47:46+09:00 — local_activation_p95_ranked_mixed_precision_controls
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_ranked_controls.py --ranking-csv results/validation_local_activation_proxy.csv --ranking-action int4 --risk-metric p95_relative_activation_error --ranking-label local_activation_p95 --evaluation-split test --max-samples 128`
+- Git branch: `main`
+- Git commit: `24b4911`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| ranking_label | local_activation_p95 |
+| ranking_csv | results\validation_local_activation_proxy.csv |
+| ranking_action | int4 |
+| risk_metric | p95_relative_activation_error |
+| evaluation_split | test |
+| max_samples | 128 |
+| protect_counts | [0, 1, 2, 4] |
+| default_bits | 4 |
+| protected_bits | 32 |
+| include_bottom_controls | False |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| uniform_int4_flip_rate | 0.09375 |
+| uniform_int4_quantized_accuracy | 0.8984375 |
+| uniform_int4_memory_saving_ratio | 0.8742483362615274 |
+| uniform_int4_mean_margin_risk | 0.6231024265289307 |
+| local_activation_p95_top1_fp32_flip_rate | 0.0234375 |
+| local_activation_p95_top1_fp32_quantized_accuracy | 0.96875 |
+| local_activation_p95_top1_fp32_memory_saving_ratio | 0.873511859230539 |
+| local_activation_p95_top1_fp32_mean_margin_risk | 0.26023995876312256 |
+| local_activation_p95_top2_fp32_flip_rate | 0.015625 |
+| local_activation_p95_top2_fp32_quantized_accuracy | 0.9765625 |
+| local_activation_p95_top2_fp32_memory_saving_ratio | 0.8677402841305483 |
+| local_activation_p95_top2_fp32_mean_margin_risk | 0.2503303289413452 |
+| local_activation_p95_top4_fp32_flip_rate | 0.0078125 |
+| local_activation_p95_top4_fp32_quantized_accuracy | 0.984375 |
+| local_activation_p95_top4_fp32_memory_saving_ratio | 0.8642132104583317 |
+| local_activation_p95_top4_fp32_mean_margin_risk | 0.19005124270915985 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\local_activation_p95_mixed_controls.csv |
+
+
+
+## 2026-06-23T21:48:09+09:00 — local_activation_p95_ranked_mixed_precision_controls
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_ranked_controls.py --ranking-csv results/validation_local_activation_proxy.csv --ranking-action int4 --risk-metric p95_relative_activation_error --ranking-label local_activation_p95 --evaluation-split test --max-samples 2000`
+- Git branch: `main`
+- Git commit: `24b4911`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| ranking_label | local_activation_p95 |
+| ranking_csv | results\validation_local_activation_proxy.csv |
+| ranking_action | int4 |
+| risk_metric | p95_relative_activation_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| protect_counts | [0, 1, 2, 4] |
+| default_bits | 4 |
+| protected_bits | 32 |
+| include_bottom_controls | False |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| uniform_int4_flip_rate | 0.153 |
+| uniform_int4_quantized_accuracy | 0.846 |
+| uniform_int4_memory_saving_ratio | 0.8742483362615274 |
+| uniform_int4_mean_margin_risk | 0.7086520195007324 |
+| local_activation_p95_top1_fp32_flip_rate | 0.0125 |
+| local_activation_p95_top1_fp32_quantized_accuracy | 0.9845 |
+| local_activation_p95_top1_fp32_memory_saving_ratio | 0.873511859230539 |
+| local_activation_p95_top1_fp32_mean_margin_risk | 0.24971544742584229 |
+| local_activation_p95_top2_fp32_flip_rate | 0.01 |
+| local_activation_p95_top2_fp32_quantized_accuracy | 0.988 |
+| local_activation_p95_top2_fp32_memory_saving_ratio | 0.8677402841305483 |
+| local_activation_p95_top2_fp32_mean_margin_risk | 0.22679638862609863 |
+| local_activation_p95_top4_fp32_flip_rate | 0.0065 |
+| local_activation_p95_top4_fp32_quantized_accuracy | 0.9905 |
+| local_activation_p95_top4_fp32_memory_saving_ratio | 0.8642132104583317 |
+| local_activation_p95_top4_fp32_mean_margin_risk | 0.18606945872306824 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\local_activation_p95_mixed_controls.csv |
+
