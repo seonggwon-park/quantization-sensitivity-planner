@@ -512,3 +512,145 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\oracle_guided_mixed_controls.csv |
 
+
+
+## 2026-06-23T21:29:53+09:00 — weight_l2_ranked_mixed_precision_controls
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_ranked_controls.py --ranking-csv results/validation_single_layer_sweep.csv --ranking-action int4 --risk-metric relative_l2_weight_error --ranking-label weight_l2 --evaluation-split test --max-samples 128 --include-bottom-controls`
+- Git branch: `main`
+- Git commit: `c90b3ba`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| ranking_label | weight_l2 |
+| ranking_csv | results\validation_single_layer_sweep.csv |
+| ranking_action | int4 |
+| risk_metric | relative_l2_weight_error |
+| evaluation_split | test |
+| max_samples | 128 |
+| protect_counts | [0, 1, 2, 4] |
+| default_bits | 4 |
+| protected_bits | 32 |
+| include_bottom_controls | True |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| uniform_int4_flip_rate | 0.09375 |
+| uniform_int4_quantized_accuracy | 0.8984375 |
+| uniform_int4_memory_saving_ratio | 0.8742483362615274 |
+| uniform_int4_mean_margin_risk | 0.6231024265289307 |
+| weight_l2_top1_fp32_flip_rate | 0.125 |
+| weight_l2_top1_fp32_quantized_accuracy | 0.8671875 |
+| weight_l2_top1_fp32_memory_saving_ratio | 0.871362548711532 |
+| weight_l2_top1_fp32_mean_margin_risk | 0.6351816058158875 |
+| weight_l2_bottom1_fp32_flip_rate | 0.09375 |
+| weight_l2_bottom1_fp32_quantized_accuracy | 0.8984375 |
+| weight_l2_bottom1_fp32_memory_saving_ratio | 0.8741681754962497 |
+| weight_l2_bottom1_fp32_mean_margin_risk | 0.620140016078949 |
+| weight_l2_top2_fp32_flip_rate | 0.078125 |
+| weight_l2_top2_fp32_quantized_accuracy | 0.9140625 |
+| weight_l2_top2_fp32_memory_saving_ratio | 0.8251899479116063 |
+| weight_l2_top2_fp32_mean_margin_risk | 0.6134971380233765 |
+| weight_l2_bottom2_fp32_flip_rate | 0.015625 |
+| weight_l2_bottom2_fp32_quantized_accuracy | 0.9765625 |
+| weight_l2_bottom2_fp32_memory_saving_ratio | 0.8734316984652613 |
+| weight_l2_bottom2_fp32_mean_margin_risk | 0.2616928517818451 |
+| weight_l2_top4_fp32_flip_rate | 0.0859375 |
+| weight_l2_top4_fp32_quantized_accuracy | 0.90625 |
+| weight_l2_top4_fp32_memory_saving_ratio | 0.6289563945119221 |
+| weight_l2_top4_fp32_mean_margin_risk | 0.5865545868873596 |
+| weight_l2_bottom4_fp32_flip_rate | 0.015625 |
+| weight_l2_bottom4_fp32_quantized_accuracy | 0.9765625 |
+| weight_l2_bottom4_fp32_memory_saving_ratio | 0.8702252678541553 |
+| weight_l2_bottom4_fp32_mean_margin_risk | 0.27372318506240845 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\weight_l2_mixed_controls.csv |
+
+
+
+## 2026-06-23T21:30:24+09:00 — weight_l2_ranked_mixed_precision_controls
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_ranked_controls.py --ranking-csv results/validation_single_layer_sweep.csv --ranking-action int4 --risk-metric relative_l2_weight_error --ranking-label weight_l2 --evaluation-split test --max-samples 2000 --include-bottom-controls`
+- Git branch: `main`
+- Git commit: `c90b3ba`
+- Git working tree: `M docs/experiment_log.md`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| ranking_label | weight_l2 |
+| ranking_csv | results\validation_single_layer_sweep.csv |
+| ranking_action | int4 |
+| risk_metric | relative_l2_weight_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| protect_counts | [0, 1, 2, 4] |
+| default_bits | 4 |
+| protected_bits | 32 |
+| include_bottom_controls | True |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| uniform_int4_flip_rate | 0.153 |
+| uniform_int4_quantized_accuracy | 0.846 |
+| uniform_int4_memory_saving_ratio | 0.8742483362615274 |
+| uniform_int4_mean_margin_risk | 0.7086520195007324 |
+| weight_l2_top1_fp32_flip_rate | 0.134 |
+| weight_l2_top1_fp32_quantized_accuracy | 0.865 |
+| weight_l2_top1_fp32_memory_saving_ratio | 0.871362548711532 |
+| weight_l2_top1_fp32_mean_margin_risk | 0.6763155460357666 |
+| weight_l2_bottom1_fp32_flip_rate | 0.1505 |
+| weight_l2_bottom1_fp32_quantized_accuracy | 0.8485 |
+| weight_l2_bottom1_fp32_memory_saving_ratio | 0.8741681754962497 |
+| weight_l2_bottom1_fp32_mean_margin_risk | 0.7063938975334167 |
+| weight_l2_top2_fp32_flip_rate | 0.1195 |
+| weight_l2_top2_fp32_quantized_accuracy | 0.8795 |
+| weight_l2_top2_fp32_memory_saving_ratio | 0.8251899479116063 |
+| weight_l2_top2_fp32_mean_margin_risk | 0.6574708819389343 |
+| weight_l2_bottom2_fp32_flip_rate | 0.012 |
+| weight_l2_bottom2_fp32_quantized_accuracy | 0.985 |
+| weight_l2_bottom2_fp32_memory_saving_ratio | 0.8734316984652613 |
+| weight_l2_bottom2_fp32_mean_margin_risk | 0.25149592757225037 |
+| weight_l2_top4_fp32_flip_rate | 0.1075 |
+| weight_l2_top4_fp32_quantized_accuracy | 0.8915 |
+| weight_l2_top4_fp32_memory_saving_ratio | 0.6289563945119221 |
+| weight_l2_top4_fp32_mean_margin_risk | 0.6378053426742554 |
+| weight_l2_bottom4_fp32_flip_rate | 0.008 |
+| weight_l2_bottom4_fp32_quantized_accuracy | 0.988 |
+| weight_l2_bottom4_fp32_memory_saving_ratio | 0.8702252678541553 |
+| weight_l2_bottom4_fp32_mean_margin_risk | 0.2593787610530853 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\weight_l2_mixed_controls.csv |
+
