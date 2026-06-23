@@ -960,3 +960,61 @@ Automatically generated experiment records.
 | results_csv | results\local_activation_p95_additive_planner_results.csv |
 | allocations_csv | results\local_activation_p95_additive_planner_allocations.csv |
 
+
+
+## 2026-06-23T21:57:55+09:00 — local_activation_p95_additive_mixed_precision_planner
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_additive_planner.py --risk-csv results/validation_local_activation_proxy_all_bits.csv --risk-metric p95_relative_activation_error --risk-label local_activation_p95 --memory-saving-ratios 0.873 0.870 0.850 0.800 --evaluation-split test --max-samples 2000`
+- Git branch: `main`
+- Git commit: `0ad3c77`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| risk_label | local_activation_p95 |
+| risk_csv | results\validation_local_activation_proxy_all_bits.csv |
+| risk_metric | p95_relative_activation_error |
+| evaluation_split | test |
+| max_samples | 2000 |
+| requested_memory_saving_ratios | [0.873, 0.87, 0.85, 0.8] |
+| memory_quantum_kb | 1 |
+| planner | multiple-choice knapsack dynamic programming with additive layer-action risk |
+| quantization | mixed weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| save_0_873_flip_rate | 0.0055 |
+| save_0_873_quantized_accuracy | 0.9915 |
+| save_0_873_actual_memory_saving_ratio | 0.8730323260811101 |
+| save_0_873_planner_objective | 2.0864445240586056 |
+| save_0_870_flip_rate | 0.0045 |
+| save_0_870_quantized_accuracy | 0.9935 |
+| save_0_870_actual_memory_saving_ratio | 0.870077829303734 |
+| save_0_870_planner_objective | 1.513387110549956 |
+| save_0_850_flip_rate | 0.0025 |
+| save_0_850_quantized_accuracy | 0.9945 |
+| save_0_850_actual_memory_saving_ratio | 0.8500247550041878 |
+| save_0_850_planner_objective | 0.6974130095127287 |
+| save_0_800_flip_rate | 0.0005 |
+| save_0_800_quantized_accuracy | 0.9955 |
+| save_0_800_actual_memory_saving_ratio | 0.8000588322759449 |
+| save_0_800_planner_objective | 0.2951178804107705 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| results_csv | results\local_activation_p95_additive_planner_results.csv |
+| allocations_csv | results\local_activation_p95_additive_planner_allocations.csv |
+
