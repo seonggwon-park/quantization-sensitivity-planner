@@ -654,3 +654,49 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\weight_l2_mixed_controls.csv |
 
+
+
+## 2026-06-23T21:43:37+09:00 — local_activation_proxy
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_activation_proxy.py --split validation --max-samples 128 --layers conv1 fc --bits 32 4 --output results/activation_proxy_smoke.csv`
+- Git branch: `main`
+- Git commit: `45e5b88`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| data_split | validation |
+| max_samples | 128 |
+| requested_bits | [32, 4] |
+| num_layers | 2 |
+| proxy | forward-only local module-output reconstruction error |
+| quantization | weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| num_layer_action_pairs | 4 |
+| proxy_runtime_seconds | 2.6807046998292208 |
+| highest_p95_layer | conv1 |
+| highest_p95_action | int4 |
+| highest_p95_relative_activation_error | 0.23810240626335144 |
+| highest_mean_layer | conv1 |
+| highest_mean_action | int4 |
+| highest_mean_relative_activation_error | 0.20688819885253906 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\activation_proxy_smoke.csv |
+
