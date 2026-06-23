@@ -4,9 +4,9 @@ from pathlib import Path
 
 import torch
 
-from experiment_logger import record_experiment
 from config import ExperimentConfig
 from data import build_dataloaders, make_fixed_subset_loader
+from experiment_logger import record_experiment
 from metrics import compare_binary_models
 from model import load_binary_resnet18_checkpoint
 from quantization import (
@@ -28,9 +28,15 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--split",
+        choices=["validation", "test"],
+        default="test",
+    )
+
+    parser.add_argument(
         "--max-samples",
         type=int,
-        default=500,
+        default=None,
     )
 
     parser.add_argument(
@@ -47,10 +53,19 @@ def parse_arguments():
         default=None,
     )
 
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+    )
+
     return parser.parse_args()
 
 
 def save_csv(rows, output_path: Path):
+    if not rows:
+        return
+
     output_path.parent.mkdir(
         parents=True,
         exist_ok=True,
@@ -86,6 +101,22 @@ def bit_to_action_name(bits: int) -> str:
     return mapping[bits]
 
 
+def resolve_output_path(
+    args,
+    config: ExperimentConfig,
+) -> Path:
+    if args.output is not None:
+        return args.output
+
+    if args.split == "test":
+        return config.result_dir / "single_layer_sweep.csv"
+
+    return (
+        config.result_dir
+        / f"{args.split}_single_layer_sweep.csv"
+    )
+
+
 def main():
     args = parse_arguments()
 
@@ -98,7 +129,7 @@ def main():
     dataloaders = build_dataloaders(config)
 
     analysis_loader = make_fixed_subset_loader(
-        original_loader=dataloaders["test"],
+        original_loader=dataloaders[args.split],
         max_samples=args.max_samples,
         seed=config.seed,
     )
@@ -127,9 +158,15 @@ def main():
                 f"Available layers: {all_layer_names}"
             )
 
+    output_path = resolve_output_path(
+        args=args,
+        config=config,
+    )
+
     fp32_memory_mb = estimate_parameter_memory_mb(
         fp32_model,
         layer_bits={},
+        default_bits=32,
     )
 
     rows = []
@@ -141,8 +178,11 @@ def main():
             action = bit_to_action_name(bits)
 
             print(
-                f"\n[{layer_index + 1}/{len(target_layer_names)}] "
-                f"layer={layer_name}, action={action}"
+                f"\n[{layer_index + 1}/"
+                f"{len(target_layer_names)}] "
+                f"split={args.split}, "
+                f"layer={layer_name}, "
+                f"action={action}"
             )
 
             quantized_model = (
@@ -182,12 +222,14 @@ def main():
 
             estimated_memory_mb = (
                 estimate_parameter_memory_mb(
-                    fp32_model,
+                    model=fp32_model,
                     layer_bits=layer_bits,
+                    default_bits=32,
                 )
             )
 
             row = {
+                "data_split": args.split,
                 "layer_index": layer_index,
                 "layer": layer_name,
                 "action": action,
@@ -211,30 +253,24 @@ def main():
             }
 
             rows.append(row)
+            save_csv(rows, output_path)
 
             print(row)
-
-            output_path = (
-                config.result_dir
-                / "single_layer_sweep.csv"
-            )
-
-            save_csv(rows, output_path)
 
             del quantized_model
 
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-    output_path = (
-        config.result_dir / "single_layer_sweep.csv"
-    )
+    if not rows:
+        raise RuntimeError(
+            "No single-layer experiments were executed."
+        )
 
-    print(f"\nSaved final sweep: {output_path}")
     worst_risk_row = max(
-    rows,
-    key=lambda row: row["p95_margin_risk"],
-)
+        rows,
+        key=lambda row: row["p95_margin_risk"],
+    )
 
     worst_flip_row = max(
         rows,
@@ -246,6 +282,7 @@ def main():
         config={
             "task": config.class_names,
             "model": "binary ResNet-18",
+            "data_split": args.split,
             "max_samples": args.max_samples,
             "requested_bits": args.bits,
             "num_layers": len(target_layer_names),
@@ -256,13 +293,21 @@ def main():
         },
         metrics={
             "num_experiments": len(rows),
-            "highest_p95_risk_layer": worst_risk_row["layer"],
-            "highest_p95_risk_action": worst_risk_row["action"],
+            "highest_p95_risk_layer": worst_risk_row[
+                "layer"
+            ],
+            "highest_p95_risk_action": worst_risk_row[
+                "action"
+            ],
             "highest_p95_margin_risk": worst_risk_row[
                 "p95_margin_risk"
             ],
-            "highest_flip_rate_layer": worst_flip_row["layer"],
-            "highest_flip_rate_action": worst_flip_row["action"],
+            "highest_flip_rate_layer": worst_flip_row[
+                "layer"
+            ],
+            "highest_flip_rate_action": worst_flip_row[
+                "action"
+            ],
             "highest_flip_rate": worst_flip_row[
                 "flip_rate"
             ],
@@ -271,6 +316,8 @@ def main():
             "csv": str(output_path),
         },
     )
+
+    print(f"\nSaved final sweep: {output_path}")
 
 
 if __name__ == "__main__":

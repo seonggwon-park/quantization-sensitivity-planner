@@ -1,4 +1,5 @@
 import copy
+from collections.abc import Mapping
 
 import torch
 import torch.nn as nn
@@ -15,17 +16,9 @@ def fake_quantize_weight_per_output_channel(
     """
     Symmetric per-output-channel fake quantization.
 
-    FP32:
-        Return original weights.
-
-    FP16:
-        Round weights to FP16 values, then cast back to FP32.
-
-    INT8 / INT4:
-        Quantize-dequantize with symmetric per-output-channel scaling.
-
     Returned tensor is still float32.
-    This is intentional for perturbation analysis.
+    This is intentional: this project currently measures numerical
+    perturbation, not real packed INT4 hardware inference.
     """
 
     if bits not in SUPPORTED_BITS:
@@ -79,9 +72,8 @@ def fake_quantize_weight_per_output_channel(
 
 def list_quantizable_layers(model: nn.Module) -> list[str]:
     """
-    Only Conv2d and Linear layers are quantization targets.
-
-    BatchNorm / bias / activation remain FP32 in this first experiment.
+    Quantization targets in the first study:
+    Conv2d and Linear weights only.
     """
 
     layer_names = []
@@ -91,6 +83,78 @@ def list_quantizable_layers(model: nn.Module) -> list[str]:
             layer_names.append(name)
 
     return layer_names
+
+
+def validate_layer_bits(
+    model: nn.Module,
+    layer_bits: Mapping[str, int],
+) -> None:
+    """
+    Validate a partial or complete layer -> bit-width mapping.
+    """
+
+    known_layers = set(
+        list_quantizable_layers(model)
+    )
+
+    unknown_layers = set(layer_bits) - known_layers
+
+    if unknown_layers:
+        raise ValueError(
+            f"Unknown quantizable layers: {unknown_layers}"
+        )
+
+    unsupported = {
+        layer_name: bits
+        for layer_name, bits in layer_bits.items()
+        if int(bits) not in SUPPORTED_BITS
+    }
+
+    if unsupported:
+        raise ValueError(
+            f"Unsupported bit assignments: {unsupported}"
+        )
+
+
+def resolve_layer_bits(
+    model: nn.Module,
+    layer_bits: Mapping[str, int] | None = None,
+    default_bits: int = 32,
+) -> dict[str, int]:
+    """
+    Convert a partial assignment into a complete assignment.
+
+    Example:
+        default_bits = 4
+        layer_bits = {"conv1": 32}
+
+    means:
+        conv1 -> FP32
+        every other Conv2d / Linear -> INT4
+    """
+
+    if default_bits not in SUPPORTED_BITS:
+        raise ValueError(
+            f"Unsupported default bit-width: {default_bits}"
+        )
+
+    layer_bits = dict(layer_bits or {})
+
+    validate_layer_bits(model, layer_bits)
+
+    resolved = {
+        layer_name: default_bits
+        for layer_name in list_quantizable_layers(model)
+    }
+
+    resolved.update(
+        {
+            layer_name: int(bits)
+            for layer_name, bits in layer_bits.items()
+        }
+    )
+
+    return resolved
 
 
 def apply_fake_quantization_to_module(
@@ -117,6 +181,46 @@ def apply_fake_quantization_to_module(
         module.weight.copy_(fake_quantized_weight)
 
 
+def build_mixed_quantized_model(
+    fp32_model: nn.Module,
+    layer_bits: Mapping[str, int] | None,
+    device: torch.device,
+    default_bits: int = 32,
+) -> nn.Module:
+    """
+    Build a mixed-precision fake-quantized copy of the FP32 model.
+
+    Important:
+    - fp32_model is never modified.
+    - every experiment starts from a fresh FP32 copy.
+    - layer_bits can be partial when default_bits is provided.
+    """
+
+    resolved_bits = resolve_layer_bits(
+        model=fp32_model,
+        layer_bits=layer_bits,
+        default_bits=default_bits,
+    )
+
+    quantized_model = copy.deepcopy(fp32_model)
+    quantized_model = quantized_model.cpu().eval()
+
+    for layer_name, bits in resolved_bits.items():
+        if bits == 32:
+            continue
+
+        target_module = quantized_model.get_submodule(
+            layer_name
+        )
+
+        apply_fake_quantization_to_module(
+            module=target_module,
+            bits=bits,
+        )
+
+    return quantized_model.to(device).eval()
+
+
 def build_single_layer_quantized_model(
     fp32_model: nn.Module,
     layer_name: str,
@@ -124,22 +228,17 @@ def build_single_layer_quantized_model(
     device: torch.device,
 ) -> nn.Module:
     """
-    Copy FP32 model and fake-quantize exactly one layer.
+    FP32 everywhere except one selected layer.
     """
 
-    quantized_model = copy.deepcopy(fp32_model)
-    quantized_model = quantized_model.cpu().eval()
-
-    target_module = quantized_model.get_submodule(
-        layer_name
+    return build_mixed_quantized_model(
+        fp32_model=fp32_model,
+        layer_bits={
+            layer_name: bits,
+        },
+        default_bits=32,
+        device=device,
     )
-
-    apply_fake_quantization_to_module(
-        target_module,
-        bits=bits,
-    )
-
-    return quantized_model.to(device).eval()
 
 
 def build_uniform_quantized_model(
@@ -148,25 +247,15 @@ def build_uniform_quantized_model(
     device: torch.device,
 ) -> nn.Module:
     """
-    Fake-quantize every Conv2d and Linear layer.
+    Same bit-width for every Conv2d and Linear layer.
     """
 
-    quantized_model = copy.deepcopy(fp32_model)
-    quantized_model = quantized_model.cpu().eval()
-
-    for layer_name in list_quantizable_layers(
-        quantized_model
-    ):
-        module = quantized_model.get_submodule(
-            layer_name
-        )
-
-        apply_fake_quantization_to_module(
-            module,
-            bits=bits,
-        )
-
-    return quantized_model.to(device).eval()
+    return build_mixed_quantized_model(
+        fp32_model=fp32_model,
+        layer_bits={},
+        default_bits=bits,
+        device=device,
+    )
 
 
 def relative_l2_weight_error(
@@ -175,7 +264,7 @@ def relative_l2_weight_error(
     epsilon: float = 1e-8,
 ) -> float:
     """
-    Simple baseline proxy:
+    Simple weight-space proxy baseline:
     ||W_q - W||_2 / ||W||_2
     """
 
@@ -183,37 +272,40 @@ def relative_l2_weight_error(
         quantized_weight - original_weight
     ).norm(p=2)
 
-    denominator = original_weight.norm(p=2).clamp_min(
-        epsilon
-    )
+    denominator = original_weight.norm(
+        p=2
+    ).clamp_min(epsilon)
 
     return (numerator / denominator).item()
 
 
 def estimate_parameter_memory_mb(
     model: nn.Module,
-    layer_bits: dict[str, int],
+    layer_bits: Mapping[str, int] | None = None,
+    default_bits: int = 32,
 ) -> float:
     """
-    Estimate parameter memory only.
+    Estimate parameter storage only.
 
-    Quantized Conv/Linear weights use chosen bits.
-    Everything else remains FP32.
-
-    This does not include:
-    - runtime activations
-    - CUDA kernel workspace
-    - optimizer states
-    - real hardware packing overhead
+    Conv2d / Linear weights use assigned bit-widths.
+    Bias, BatchNorm and all other parameters remain FP32.
     """
 
-    quantizable_layers = set(
-        list_quantizable_layers(model)
+    resolved_bits = resolve_layer_bits(
+        model=model,
+        layer_bits=layer_bits,
+        default_bits=default_bits,
     )
+
+    quantizable_layers = set(resolved_bits)
 
     total_bits = 0
 
     for parameter_name, parameter in model.named_parameters():
+        if "." not in parameter_name:
+            total_bits += parameter.numel() * 32
+            continue
+
         module_name, parameter_type = parameter_name.rsplit(
             ".",
             maxsplit=1,
@@ -223,7 +315,7 @@ def estimate_parameter_memory_mb(
             parameter_type == "weight"
             and module_name in quantizable_layers
         ):
-            bits = layer_bits.get(module_name, 32)
+            bits = resolved_bits[module_name]
         else:
             bits = 32
 
