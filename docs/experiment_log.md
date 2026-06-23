@@ -700,3 +700,49 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\activation_proxy_smoke.csv |
 
+
+
+## 2026-06-23T21:44:20+09:00 — local_activation_proxy
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_activation_proxy.py --split validation --max-samples 1000 --bits 4 --output results/validation_local_activation_proxy.csv`
+- Git branch: `main`
+- Git commit: `b9a942e`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| data_split | validation |
+| max_samples | 1000 |
+| requested_bits | [4] |
+| num_layers | 21 |
+| proxy | forward-only local module-output reconstruction error |
+| quantization | weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| num_layer_action_pairs | 21 |
+| proxy_runtime_seconds | 3.4372811000794172 |
+| highest_p95_layer | conv1 |
+| highest_p95_action | int4 |
+| highest_p95_relative_activation_error | 0.23875348269939423 |
+| highest_mean_layer | conv1 |
+| highest_mean_action | int4 |
+| highest_mean_relative_activation_error | 0.20727916061878204 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\validation_local_activation_proxy.csv |
+
