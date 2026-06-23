@@ -104,3 +104,54 @@ Automatically generated experiment records.
 |---|---|
 | csv | results\uniform_baselines.csv |
 
+
+
+## 2026-06-23T20:15:13+09:00 — uniform_fake_quantization_baseline
+
+- Command: `C:\Users\coin\anaconda3\envs\quant-planner\python.exe run_baselines.py --max-samples 2000`
+- Git branch: `main`
+- Git commit: `e21d77a`
+- Git working tree: `clean`
+- Python: `3.11.15`
+- PyTorch: `2.7.1+cu118`
+- CUDA available: `True`
+- CUDA runtime: `11.8`
+- GPU: `NVIDIA GeForce RTX 3080 Ti`
+
+### Configuration
+
+| Key | Value |
+|---|---|
+| task | ['airplane', 'automobile'] |
+| model | binary ResNet-18 |
+| max_samples | 2000 |
+| actions | ['fp32', 'fp16', 'int8', 'int4'] |
+| quantization | weight-only fake quantization, per-output-channel symmetric |
+
+### Metrics
+
+| Key | Value |
+|---|---|
+| fp32_quantized_accuracy | 0.996 |
+| fp32_flip_rate | 0.0 |
+| fp32_mean_margin_risk | 0.0 |
+| fp32_memory_saving_ratio | 0.0 |
+| fp16_quantized_accuracy | 0.996 |
+| fp16_flip_rate | 0.0 |
+| fp16_mean_margin_risk | 0.0013704068260267377 |
+| fp16_memory_saving_ratio | 0.4995704778637299 |
+| int8_quantized_accuracy | 0.9955 |
+| int8_flip_rate | 0.0005 |
+| int8_mean_margin_risk | 0.03685024008154869 |
+| int8_memory_saving_ratio | 0.7493557167955949 |
+| int4_quantized_accuracy | 0.846 |
+| int4_flip_rate | 0.153 |
+| int4_mean_margin_risk | 0.7086520195007324 |
+| int4_memory_saving_ratio | 0.8742483362615274 |
+
+### Artifacts
+
+| Key | Value |
+|---|---|
+| csv | results\uniform_baselines.csv |
+
