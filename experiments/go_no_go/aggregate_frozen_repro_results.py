@@ -602,12 +602,86 @@ def comparison_row(
     }
 
 
+def build_unique_method_index(per_seed: pd.DataFrame) -> pd.DataFrame:
+    key_columns = ["seed", "requested_memory_saving_ratio", "selection"]
+    indexed = per_seed.set_index(key_columns, drop=False)
+    if not indexed.index.is_unique:
+        duplicate_mask = per_seed.duplicated(key_columns, keep=False)
+        duplicate_rows = per_seed.loc[
+            duplicate_mask, key_columns
+        ].sort_values(key_columns, kind="mergesort")
+        raise ValueError(
+            "Duplicate seed-budget-selection rows prevent indexed lookup:\n"
+            + duplicate_rows.to_string(index=False)
+        )
+    missing_preserved_columns = [
+        column for column in key_columns if column not in indexed.columns
+    ]
+    if missing_preserved_columns:
+        raise RuntimeError(
+            "Indexed lookup dropped required metadata columns: "
+            f"{missing_preserved_columns}"
+        )
+    return indexed
+
+
+def validate_main_pairwise_grid(per_seed: pd.DataFrame) -> None:
+    observed_seeds = {int(seed) for seed in per_seed["seed"].unique()}
+    if observed_seeds != set(EXPECTED_SEEDS):
+        raise ValueError(
+            "Main pairwise input must contain exactly the expected three "
+            f"seeds: observed={sorted(observed_seeds)}, "
+            f"expected={list(EXPECTED_SEEDS)}"
+        )
+    observed_budgets = {
+        float(budget)
+        for budget in per_seed["requested_memory_saving_ratio"].unique()
+    }
+    if observed_budgets != set(BUDGETS):
+        raise ValueError(
+            "Main pairwise input must contain exactly the expected six "
+            f"budgets: observed={sorted(observed_budgets)}, "
+            f"expected={list(BUDGETS)}"
+        )
+
+    expected_cells = {
+        (seed, budget) for seed in EXPECTED_SEEDS for budget in BUDGETS
+    }
+    required_methods = (VECTOR_MAIN, *SCALAR_BASELINES)
+    problems = []
+    for method in required_methods:
+        method_rows = per_seed[per_seed["selection"].eq(method)]
+        counts = method_rows.groupby(
+            ["seed", "requested_memory_saving_ratio"],
+            dropna=False,
+        ).size()
+        observed_cells = {
+            (int(seed), float(budget)) for seed, budget in counts.index
+        }
+        missing = sorted(expected_cells.difference(observed_cells))
+        extra = sorted(observed_cells.difference(expected_cells))
+        wrong_counts = {
+            (int(seed), float(budget)): int(count)
+            for (seed, budget), count in counts.items()
+            if int(count) != 1
+        }
+        if missing or extra or wrong_counts:
+            problems.append(
+                f"method={method}, missing={missing}, extra={extra}, "
+                f"non_unit_counts={wrong_counts}"
+            )
+    if problems:
+        raise ValueError(
+            "Main pairwise grid requires one vector-main and one row per "
+            "fixed scalar baseline in every seed-budget cell:\n"
+            + "\n".join(problems)
+        )
+
+
 def build_main_pairwise(per_seed: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    indexed = per_seed.set_index(
-        ["seed", "requested_memory_saving_ratio", "selection"],
-        verify_integrity=True,
-    )
+    indexed = build_unique_method_index(per_seed)
+    validate_main_pairwise_grid(per_seed)
     for seed in EXPECTED_SEEDS:
         for budget in BUDGETS:
             candidate = indexed.loc[(seed, budget, VECTOR_MAIN)]
@@ -716,10 +790,7 @@ def build_envelope_comparisons(per_seed: pd.DataFrame) -> pd.DataFrame:
 
 def build_ablation_comparisons(per_seed: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    indexed = per_seed.set_index(
-        ["seed", "requested_memory_saving_ratio", "selection"],
-        verify_integrity=True,
-    )
+    indexed = build_unique_method_index(per_seed)
     for seed in EXPECTED_SEEDS:
         for budget in BUDGETS:
             ablation = indexed.loc[(seed, budget, VECTOR_ABLATION)]
