@@ -11,7 +11,7 @@ root with `python -m experiments.go_no_go.<module>`.
 | Benchmark adapter | Existing repository function(s) called |
 |---|---|
 | `load_reference_model(checkpoint_path, device)` | `model.load_binary_resnet18_checkpoint`; that loader calls `model.build_binary_resnet18(pretrained=False)` and loads `checkpoint["model_state_dict"]` |
-| `build_binary_eval_dataset()` | `data.build_dataloaders(ExperimentConfig())["test"].dataset`; the existing path uses `data.BinaryCIFAR10` and the evaluation transform returned by `data.build_transforms` |
+| `build_binary_eval_dataset(source_split)` | `data.BinaryCIFAR10` with the evaluation transform returned by `data.build_transforms`; `source_split="train"` builds the no-augmentation calibration pool and `source_split="test"` is reserved for final evaluation |
 | `apply_existing_quantization_inplace(module, action_name)` | `additive_planner.action_to_bits`, then `quantization.apply_fake_quantization_to_module`; the latter calls `quantization.fake_quantize_weight_per_output_channel` |
 | `get_checkpoint_default_path()` | `config.ExperimentConfig().checkpoint_path`, currently `checkpoints/resnet18_binary_best.pt` |
 
@@ -21,18 +21,24 @@ quantization for `int8` and `int4`; float weights after dequantization.
 
 ## Benchmark flow
 
-`run_single_action_benchmark.py` deterministically partitions the existing
-binary test dataset into disjoint `ranking` and `holdout` subsets. For every
-requested layer/action it deep-copies the reference model, applies the adapter
-to exactly one module, and delegates model comparison to the existing
-`metrics.compare_binary_models` function.
+`run_single_action_benchmark.py` uses the full binary TRAIN pool with the
+existing evaluation transform (resize, tensor conversion, and ImageNet
+normalization; no random augmentation). It builds a fixed, class-balanced
+oracle set with `oracle_seed=2026`, removes those samples, and builds each
+class-balanced score set from the remainder with its own score seed. For every
+Conv2d/Linear layer and `fp16`/`int8`/`int4` action it deep-copies the reference
+model and applies the adapter to exactly one copied module.
 
-`analyze_rankings.py` compares ranking and holdout layer orderings with
-Spearman correlation and top-k overlap and emits an explicit `GO`/`NO_GO`
-decision under configurable thresholds. `planner_eval.py` is an offline check
-for an existing additive-planner allocation CSV: it compares saved
-`risk_value` entries with held-out single-action measurements. It never invokes
-or changes the planner.
+The exact split indices are stored in `split_indices.npz` and
+`split_indices.json`. Candidate rows are written to
+`single_action_metrics_seed{seed}.csv`. `whole_model_saving` and
+`quantizable_weight_saving` are theoretical storage-saving ratios relative to
+the FP32 whole-model parameter storage and FP32 quantizable-weight storage,
+respectively; they are not latency claims.
+
+`analyze_rankings.py` and `planner_eval.py` remain offline follow-on utilities;
+neither is invoked by the single-action benchmark, and neither changes the
+planner.
 
 Generated CSV files default to `results/go_no_go/`. The scripts refuse to
 overwrite an existing output file, preserving prior results. The repository's
@@ -44,8 +50,9 @@ benchmark does not call that logger.
 Example commands (not run during scaffold creation):
 
 ```powershell
-python -m experiments.go_no_go.run_single_action_benchmark
+python -m experiments.go_no_go.run_single_action_benchmark `
+  --score-size 512 --oracle-size 2000 `
+  --score-seeds 0 --oracle-seed 2026
 python -m experiments.go_no_go.analyze_rankings
 python -m experiments.go_no_go.planner_eval --allocations path/to/allocations.csv
 ```
-

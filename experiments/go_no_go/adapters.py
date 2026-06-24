@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 
 from additive_planner import action_to_bits
 from config import ExperimentConfig
-from data import build_dataloaders
+from data import BinaryCIFAR10, build_transforms
 from model import load_binary_resnet18_checkpoint
 from quantization import apply_fake_quantization_to_module
 
@@ -29,16 +29,33 @@ def load_reference_model(
     return model
 
 
-def build_binary_eval_dataset() -> Dataset:
-    """Return the test dataset built by the existing data pipeline."""
+def build_binary_eval_dataset(
+    source_split: str,
+) -> Dataset:
+    """Build a binary train or test pool with no random augmentation."""
 
-    # TODO(go-no-go): If evaluation configuration becomes injectable, thread
-    # it through here while continuing to call the repository data builder.
-    dataloaders = build_dataloaders(
-        ExperimentConfig()
+    normalized_split = source_split.strip().lower()
+
+    if normalized_split not in {"train", "test"}:
+        raise ValueError(
+            "source_split must be either 'train' or 'test'."
+        )
+
+    config = ExperimentConfig()
+    _, evaluation_transform = build_transforms(
+        config.image_size
     )
 
-    return dataloaders["test"].dataset
+    # TODO(go-no-go): Continue using BinaryCIFAR10 and build_transforms rather
+    # than creating benchmark-local class filtering or normalization logic.
+    return BinaryCIFAR10(
+        root=str(config.data_dir),
+        train=normalized_split == "train",
+        class_ids=config.class_ids,
+        transform=evaluation_transform,
+        source_indices=None,
+        download=False,
+    )
 
 
 def apply_existing_quantization_inplace(
@@ -65,4 +82,3 @@ def get_checkpoint_default_path() -> Path:
     # TODO(go-no-go): Continue deriving this default from ExperimentConfig so
     # the benchmark does not establish a second checkpoint convention.
     return ExperimentConfig().checkpoint_path
-
