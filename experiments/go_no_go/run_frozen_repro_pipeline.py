@@ -120,6 +120,14 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         choices=("all", *STAGES),
         default=["all"],
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help=(
+            "Resume from a compatible pipeline manifest while preserving "
+            "completed, unrequested stages."
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args(argv)
 
@@ -588,25 +596,179 @@ def stage_expected_outputs(
     }
 
 
+def load_resume_manifest(output_root: Path) -> dict[str, Any]:
+    manifest_path = output_root / "pipeline_manifest.json"
+    commands_path = output_root / "pipeline_commands.txt"
+    require_file(manifest_path, "Resume pipeline manifest")
+    require_file(commands_path, "Resume pipeline command history")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(
+            f"Could not read the existing pipeline manifest: {manifest_path}"
+        ) from error
+    if not isinstance(manifest, dict):
+        raise TypeError("Existing pipeline manifest must contain a JSON object.")
+    return manifest
+
+
+def _nested_value(payload: dict[str, Any], *keys: str) -> Any:
+    value: Any = payload
+    for key in keys:
+        if not isinstance(value, dict) or key not in value:
+            return None
+        value = value[key]
+    return value
+
+
+def validate_resume_manifest(
+    manifest: dict[str, Any],
+    args: argparse.Namespace,
+) -> None:
+    path_fields = {
+        "checkpoint path": (
+            manifest.get("checkpoint_path"),
+            args.checkpoint,
+        ),
+        "canonical split path": (
+            _nested_value(manifest, "canonical_split_paths", "npz"),
+            args.canonical_split,
+        ),
+        "canonical metadata path": (
+            _nested_value(manifest, "canonical_split_paths", "metadata"),
+            args.canonical_metadata,
+        ),
+        "confirmation split path": (
+            _nested_value(manifest, "confirmation_split_paths", "npz"),
+            args.confirmation_split,
+        ),
+        "confirmation metadata path": (
+            _nested_value(
+                manifest, "confirmation_split_paths", "metadata"
+            ),
+            args.confirmation_metadata,
+        ),
+    }
+    mismatches: list[str] = []
+    for label, (actual, expected) in path_fields.items():
+        if actual is None:
+            mismatches.append(f"{label}: missing from existing manifest")
+            continue
+        if resolved(Path(str(actual))) != resolved(expected):
+            mismatches.append(
+                f"{label}: existing={resolved(Path(str(actual)))}, "
+                f"requested={resolved(expected)}"
+            )
+
+    scalar_fields = {
+        "run name": (manifest.get("run_name"), args.run_name),
+        "batch size": (manifest.get("batch_size"), args.batch_size),
+        "beam width": (
+            _nested_value(manifest, "fixed_vector_settings", "beam_width"),
+            args.beam_width,
+        ),
+        "max states per memory bin": (
+            _nested_value(
+                manifest,
+                "fixed_vector_settings",
+                "max_states_per_memory_bin",
+            ),
+            args.max_states_per_memory_bin,
+        ),
+        "memory quantum KB": (
+            _nested_value(
+                manifest, "fixed_vector_settings", "memory_quantum_kb"
+            ),
+            args.memory_quantum_kb,
+        ),
+    }
+    for label, (actual, expected) in scalar_fields.items():
+        if actual != expected:
+            mismatches.append(
+                f"{label}: existing={actual!r}, requested={expected!r}"
+            )
+
+    existing_seeds = manifest.get("fixed_score_seeds")
+    if existing_seeds != list(args.score_seeds):
+        mismatches.append(
+            "score seeds: "
+            f"existing={existing_seeds!r}, requested={list(args.score_seeds)!r}"
+        )
+    existing_ratios = manifest.get("fixed_memory_saving_ratios")
+    requested_ratios = [float(value) for value in args.memory_saving_ratios]
+    ratios_match = (
+        isinstance(existing_ratios, list)
+        and len(existing_ratios) == len(requested_ratios)
+        and all(
+            abs(float(actual) - expected) <= 1e-12
+            for actual, expected in zip(existing_ratios, requested_ratios)
+        )
+    )
+    if not ratios_match:
+        mismatches.append(
+            "memory-saving ratios: "
+            f"existing={existing_ratios!r}, requested={requested_ratios!r}"
+        )
+
+    if mismatches:
+        raise ValueError(
+            "Resume manifest is incompatible with this invocation:\n"
+            + "\n".join(f"- {mismatch}" for mismatch in mismatches)
+        )
+
+
+def completed_stages(manifest: dict[str, Any]) -> tuple[str, ...]:
+    statuses = manifest.get("stage_completion_status")
+    if not isinstance(statuses, dict):
+        raise ValueError(
+            "Existing manifest lacks a valid stage_completion_status object."
+        )
+    return tuple(
+        stage
+        for stage in STAGES
+        if isinstance(statuses.get(stage), dict)
+        and statuses[stage].get("status") == "completed"
+    )
+
+
 def preflight_stage_outputs(
     output_root: Path,
     selected_stages: Sequence[str],
-) -> None:
+    resume_manifest: dict[str, Any] | None = None,
+) -> tuple[str, ...]:
     directories = stage_directories(output_root)
     for stage in selected_stages:
         if directories[stage].exists():
             raise FileExistsError(
-                "Refusing to overwrite an existing stage directory: "
-                f"{directories[stage]}"
+                "Refusing to run requested stage because its output directory "
+                f"already exists: stage={stage}, path={directories[stage]}"
             )
-    for path in (
-        output_root / "pipeline_manifest.json",
-        output_root / "pipeline_commands.txt",
-    ):
-        if path.exists():
+
+    if resume_manifest is None:
+        for path in (
+            output_root / "pipeline_manifest.json",
+            output_root / "pipeline_commands.txt",
+        ):
+            if path.exists():
+                raise FileExistsError(
+                    f"Refusing to overwrite existing pipeline output: {path}"
+                )
+        return ()
+
+    prior_completed = completed_stages(resume_manifest)
+    completed_set = set(prior_completed)
+    requested_set = set(selected_stages)
+    for stage, directory in directories.items():
+        if not directory.exists() or stage in requested_set:
+            continue
+        if stage not in completed_set:
             raise FileExistsError(
-                f"Refusing to overwrite existing pipeline output: {path}"
+                "Resume found an output directory for a stage that is not "
+                f"recorded complete: stage={stage}, path={directory}"
             )
+    for stage in prior_completed:
+        verify_stage_outputs(stage, output_root)
+    return prior_completed
 
 
 def verify_available_dependencies(
@@ -640,10 +802,13 @@ def make_manifest(
     selected_stages: Sequence[str],
     commands: dict[str, list[str]],
     confirmation_info: dict[str, Any],
+    invocation_arguments: Sequence[str],
 ) -> dict[str, Any]:
+    invocation_time = timestamp()
     return {
         "schema_version": SCHEMA_VERSION,
-        "created_at": timestamp(),
+        "created_at": invocation_time,
+        "resume": args.resume,
         "checkpoint_path": str(resolved(args.checkpoint)),
         "run_name": args.run_name,
         "git_commit_hash": git_commit_hash(),
@@ -700,9 +865,63 @@ def make_manifest(
             }
             for stage in STAGES
         },
+        "invocations": [
+            {
+                "timestamp": invocation_time,
+                "resume": args.resume,
+                "arguments": list(invocation_arguments),
+                "requested_stages": list(selected_stages),
+            }
+        ],
         "selection_policy": PROTOCOL_STATEMENT,
         "test_evaluation_is_terminal": True,
     }
+
+
+def update_manifest_for_resume(
+    manifest: dict[str, Any],
+    args: argparse.Namespace,
+    selected_stages: Sequence[str],
+    commands: dict[str, list[str]],
+    invocation_arguments: Sequence[str],
+) -> dict[str, Any]:
+    invocation_time = timestamp()
+    statuses = manifest.setdefault("stage_completion_status", {})
+    for stage in STAGES:
+        statuses.setdefault(stage, {"status": "not_requested"})
+    for stage in selected_stages:
+        previous_status = dict(statuses[stage])
+        statuses[stage] = {
+            "status": "pending",
+            "resume_requested_at": invocation_time,
+            "previous_status": previous_status,
+        }
+
+    command_records = manifest.setdefault("commands", [])
+    command_records.extend(
+        {
+            "stage": stage,
+            "argv": command,
+            "command_text": command_text(command),
+            "resume_invocation": True,
+            "resolved_at": invocation_time,
+        }
+        for stage, command in commands.items()
+    )
+    manifest.setdefault("invocations", []).append(
+        {
+            "timestamp": invocation_time,
+            "resume": True,
+            "arguments": list(invocation_arguments),
+            "requested_stages": list(selected_stages),
+        }
+    )
+    manifest["resume"] = True
+    manifest["resume_count"] = int(manifest.get("resume_count", 0)) + 1
+    manifest["updated_at"] = invocation_time
+    manifest["selected_stages"] = list(selected_stages)
+    manifest["last_invocation_arguments"] = list(invocation_arguments)
+    return manifest
 
 
 def write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
@@ -715,13 +934,57 @@ def write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
     temporary_path.replace(path)
 
 
-def write_commands(path: Path, commands: dict[str, list[str]]) -> None:
-    lines = [
-        f"[{stage}]\n{command_text(command)}"
-        for stage, command in commands.items()
-    ]
-    with path.open("x", encoding="utf-8") as file:
-        file.write("\n\n".join(lines) + "\n")
+def write_commands(
+    path: Path,
+    commands: dict[str, list[str]],
+    invocation_arguments: Sequence[str],
+    append: bool,
+) -> None:
+    invocation_time = timestamp()
+    invocation_text = command_text(
+        [
+            sys.executable,
+            "-m",
+            "experiments.go_no_go.run_frozen_repro_pipeline",
+            *invocation_arguments,
+        ]
+    )
+    entries = []
+    for stage, command in commands.items():
+        entries.append(
+            "\n".join(
+                (
+                    f"timestamp: {invocation_time}",
+                    f"invocation_arguments: {invocation_text}",
+                    f"stage: {stage}",
+                    f"command: {command_text(command)}",
+                )
+            )
+        )
+    mode = "a" if append else "x"
+    with path.open(mode, encoding="utf-8") as file:
+        if append:
+            file.write("\n")
+        file.write("\n\n".join(entries) + "\n")
+
+
+def print_resume_summary(
+    prior_completed: Sequence[str],
+    requested_stages: Sequence[str],
+) -> None:
+    requested_set = set(requested_stages)
+    skipped_completed = tuple(
+        stage for stage in prior_completed if stage not in requested_set
+    )
+    print("Resume summary")
+    print(f"  prior completed stages: {list(prior_completed)}")
+    print(f"  requested stages: {list(requested_stages)}")
+    print(f"  pending stages to execute: {list(requested_stages)}")
+    print(
+        "  stages skipped because already complete: "
+        f"{list(skipped_completed)}"
+    )
+    print("  selected-stage outputs are absent: PASS")
 
 
 def print_dry_run(
@@ -790,11 +1053,17 @@ def execute_pipeline(
     selected_stages: Sequence[str],
     commands: dict[str, list[str]],
     manifest: dict[str, Any],
+    invocation_arguments: Sequence[str],
 ) -> None:
     args.output_root.mkdir(parents=True, exist_ok=True)
     manifest_path = args.output_root / "pipeline_manifest.json"
     commands_path = args.output_root / "pipeline_commands.txt"
-    write_commands(commands_path, commands)
+    write_commands(
+        commands_path,
+        commands,
+        invocation_arguments=invocation_arguments,
+        append=args.resume,
+    )
     write_json_atomic(manifest_path, manifest)
 
     for stage in selected_stages:
@@ -1018,7 +1287,10 @@ def canonical_benchmark_worker(argv: Sequence[str]) -> None:
 
 
 def pipeline_main(argv: Sequence[str] | None = None) -> None:
-    args = parse_arguments(argv)
+    invocation_arguments = list(
+        argv if argv is not None else sys.argv[1:]
+    )
+    args = parse_arguments(invocation_arguments)
     selected_stages = validate_fixed_protocol(args)
 
     args.checkpoint = resolved(args.checkpoint)
@@ -1039,20 +1311,46 @@ def pipeline_main(argv: Sequence[str] | None = None) -> None:
         args.confirmation_metadata,
     )
     validate_output_isolation(args.output_root)
-    preflight_stage_outputs(args.output_root, selected_stages)
+
+    existing_manifest = None
+    if args.resume:
+        existing_manifest = load_resume_manifest(args.output_root)
+        validate_resume_manifest(existing_manifest, args)
+    prior_completed = preflight_stage_outputs(
+        args.output_root,
+        selected_stages,
+        resume_manifest=existing_manifest,
+    )
     verify_available_dependencies(args.output_root, selected_stages)
 
     commands = build_stage_commands(args, selected_stages)
-    manifest = make_manifest(
-        args=args,
-        selected_stages=selected_stages,
-        commands=commands,
-        confirmation_info=confirmation_info,
-    )
+    if existing_manifest is None:
+        manifest = make_manifest(
+            args=args,
+            selected_stages=selected_stages,
+            commands=commands,
+            confirmation_info=confirmation_info,
+            invocation_arguments=invocation_arguments,
+        )
+    else:
+        manifest = update_manifest_for_resume(
+            manifest=existing_manifest,
+            args=args,
+            selected_stages=selected_stages,
+            commands=commands,
+            invocation_arguments=invocation_arguments,
+        )
+        print_resume_summary(prior_completed, selected_stages)
     if args.dry_run:
         print_dry_run(args, selected_stages, commands)
         return
-    execute_pipeline(args, selected_stages, commands, manifest)
+    execute_pipeline(
+        args,
+        selected_stages,
+        commands,
+        manifest,
+        invocation_arguments=invocation_arguments,
+    )
 
 
 def main() -> None:
