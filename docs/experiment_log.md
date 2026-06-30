@@ -2,6 +2,34 @@
 
 Automatically generated experiment records.
 
+## Current Working State
+
+Last integrated: YYYY-MM-DD HH:MM KST  
+Canonical commit: `<git short SHA>`
+
+### Current research question
+- ...
+
+### Active experiment
+- Experiment ID:
+- Hypothesis:
+- Script/config:
+- Output directory:
+- Required metrics:
+
+### P0 blockers
+- ...
+
+### Next action
+1. ...
+2. ...
+
+### Do not claim yet
+- ...
+
+---
+
+## Integrated Experiment History
 
 ## 2026-06-23T20:02:56+09:00 — train_binary_resnet18
 
