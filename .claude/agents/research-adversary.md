@@ -23,7 +23,7 @@ You must remain read-only:
 
 Read, when relevant:
 
-1. `docs/ACTIVE_RESEARCH_STATE.md`
+1. `docs/experiment_log.md`
 2. `docs/formalization_notes.md`
 3. The task-specific code, configs, diffs, logs, CSVs, and session report
 4. `docs/COMPRESSION_PLANNING_AGENT_HANDOFF.md` only when historical context is necessary

@@ -26,7 +26,7 @@ First identify:
 
 Read these before interpreting the result:
 
-1. `docs/ACTIVE_RESEARCH_STATE.md`
+1. `docs/experiment_log.md`
 2. `docs/formalization_notes.md`
 3. Relevant scripts, configs, diffs, logs, CSVs, and session reports
 
@@ -143,7 +143,7 @@ For decision-preservation experiments, include when available:
 
 ## Canonical-document update needed?
 
-* `ACTIVE_RESEARCH_STATE.md`: Yes / No
+* `experiment_log.md`: Yes / No
 * `formalization_notes.md`: Yes / No
 * `COMPRESSION_PLANNING_AGENT_HANDOFF.md`: Yes / No
 * Reason:
